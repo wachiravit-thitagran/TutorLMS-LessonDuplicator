@@ -1,0 +1,11 @@
+dist/
+.build/
+vendor/
+node_modules/
+.phpunit.result.cache
+.phpcs-cache
+playwright-report/
+test-results/
+__pycache__/
+*.pyc
+.DS_Store

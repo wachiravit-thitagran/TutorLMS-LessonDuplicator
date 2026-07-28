@@ -1,0 +1,21 @@
+{
+	"name": "tutor-lms-curriculum-duplicator",
+	"version": "1.1.2",
+	"private": true,
+	"description": "ชุดเครื่องมือพัฒนาสำหรับปลั๊กอิน Tutor LMS Curriculum Duplicator (ตัวปลั๊กอินไม่ต้องใช้ Node ตอนรันจริง)",
+	"license": "GPL-2.0-or-later",
+	"type": "module",
+	"scripts": {
+		"lint": "eslint assets/js tests/js tests/e2e playwright.config.mjs --max-warnings=0",
+		"test": "node --test \"tests/js/**/*.test.mjs\"",
+		"test:e2e": "playwright test",
+		"test:e2e:list": "playwright test --list",
+		"check": "node --check assets/js/curriculum-duplicator.js && npm run lint && npm test"
+	},
+	"devDependencies": {
+		"@playwright/test": "^1.62.0",
+		"eslint": "^9.0.0",
+		"globals": "^15.0.0",
+		"jsdom": "^24.0.0"
+	}
+}

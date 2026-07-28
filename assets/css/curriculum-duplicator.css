@@ -1,0 +1,126 @@
+/**
+ * Tutor LMS Curriculum Duplicator
+ *
+ * สไตล์ของปุ่มถูกออกแบบให้กลืนไปกับปุ่ม action เดิมของ Course Builder
+ * (ขนาด 24px, พื้นหลังโปร่ง, เปลี่ยนสีตอน hover)
+ */
+
+.tlcd-btn {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 24px;
+	height: 24px;
+	padding: 0;
+	margin: 0;
+	border: none;
+	border-radius: 4px;
+	background: transparent;
+	color: #5b616f;
+	cursor: pointer;
+	flex-shrink: 0;
+	transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out;
+}
+
+.tlcd-btn:hover:not(:disabled),
+.tlcd-btn:focus-visible {
+	color: #3e64de;
+	background-color: rgba( 62, 100, 222, 0.08 );
+}
+
+.tlcd-btn:focus-visible {
+	outline: 2px solid #3e64de;
+	outline-offset: 1px;
+}
+
+.tlcd-btn:disabled {
+	cursor: progress;
+	opacity: 0.7;
+}
+
+.tlcd-btn svg {
+	display: block;
+	width: 20px;
+	height: 20px;
+}
+
+.tlcd-spinner {
+	display: inline-block;
+	width: 16px;
+	height: 16px;
+	border: 2px solid currentColor;
+	border-right-color: transparent;
+	border-radius: 50%;
+	animation: tlcd-spin 0.7s linear infinite;
+}
+
+@keyframes tlcd-spin {
+	to {
+		transform: rotate( 360deg );
+	}
+}
+
+@media ( prefers-reduced-motion: reduce ) {
+	.tlcd-spinner {
+		animation-duration: 2s;
+	}
+}
+
+/* --------------------------------------------------------------------- */
+/* Toast                                                                  */
+/* --------------------------------------------------------------------- */
+
+#tlcd-toast-container {
+	position: fixed;
+	z-index: 999999;
+	bottom: 24px;
+	left: 50%;
+	transform: translateX( -50% );
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+	align-items: center;
+	pointer-events: none;
+}
+
+.tlcd-toast {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	max-width: 90vw;
+	padding: 12px 16px;
+	border-radius: 6px;
+	background: #1a1b1e;
+	color: #fff;
+	font-size: 14px;
+	line-height: 1.5;
+	box-shadow: 0 6px 24px rgba( 0, 0, 0, 0.2 );
+	pointer-events: auto;
+}
+
+.tlcd-toast--success {
+	background: #24a148;
+}
+
+.tlcd-toast--warning {
+	background: #b4770a;
+}
+
+.tlcd-toast--error {
+	background: #d13b3b;
+}
+
+.tlcd-toast__action {
+	padding: 4px 10px;
+	border: 1px solid rgba( 255, 255, 255, 0.6 );
+	border-radius: 4px;
+	background: transparent;
+	color: inherit;
+	font-size: 13px;
+	cursor: pointer;
+	white-space: nowrap;
+}
+
+.tlcd-toast__action:hover {
+	background: rgba( 255, 255, 255, 0.15 );
+}

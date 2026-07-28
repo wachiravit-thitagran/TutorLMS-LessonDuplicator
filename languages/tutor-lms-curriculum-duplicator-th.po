@@ -1,0 +1,332 @@
+# คำแปลภาษาไทยของ Tutor LMS Curriculum Duplicator
+# Copyright (C) 2026 Wachiravit
+# This file is distributed under the GPL-2.0-or-later license.
+msgid ""
+msgstr ""
+"Project-Id-Version: Tutor LMS Curriculum Duplicator 1.1.2\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: th\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"X-Domain: tutor-lms-curriculum-duplicator\n"
+
+
+#: includes/api/class-content-controller.php:110
+msgid "You do not have permission to edit this item."
+msgstr "คุณไม่มีสิทธิ์แก้ไขรายการนี้"
+
+#: includes/api/class-content-controller.php:135
+msgid "You do not have permission to access this course."
+msgstr "คุณไม่มีสิทธิ์เข้าถึงคอร์สนี้"
+
+#: includes/api/class-content-controller.php:175
+msgid "The requested item was not found."
+msgstr "ไม่พบรายการที่ระบุ"
+
+#: includes/api/class-content-controller.php:183
+msgid "The requested lesson was not found."
+msgstr "ไม่พบบทเรียนที่ระบุ"
+
+#. translators: %s: post type
+#: includes/api/class-content-controller.php:195
+msgid "Duplicating %s content is not supported yet."
+msgstr "ยังไม่รองรับการทำสำเนาเนื้อหาชนิด %s"
+
+#: includes/api/class-content-controller.php:210
+msgid "This item does not belong to the specified topic."
+msgstr "รายการนี้ไม่ได้อยู่ในหัวข้อที่ระบุ"
+
+#: includes/api/class-content-controller.php:218
+msgid "This item is not inside any topic, so it cannot be duplicated yet."
+msgstr "รายการนี้ไม่ได้อยู่ภายใต้หัวข้อใด จึงยังทำสำเนาไม่ได้"
+
+#: includes/api/class-content-controller.php:226
+#: includes/api/class-topic-controller.php:70
+msgid "You do not have permission to edit this topic."
+msgstr "คุณไม่มีสิทธิ์แก้ไขหัวข้อนี้"
+
+#: includes/api/class-content-controller.php:236
+#: includes/api/class-topic-controller.php:125
+msgid "You do not have permission to edit this course."
+msgstr "คุณไม่มีสิทธิ์แก้ไขคอร์สนี้"
+
+#: includes/api/class-content-controller.php:276
+msgid "Quiz duplicated successfully."
+msgstr "ทำสำเนาแบบทดสอบเรียบร้อย"
+
+#: includes/api/class-content-controller.php:280
+msgid "Assignment duplicated successfully."
+msgstr "ทำสำเนางานที่มอบหมายเรียบร้อย"
+
+#: includes/api/class-content-controller.php:283
+msgid "Lesson duplicated successfully."
+msgstr "ทำสำเนาบทเรียนเรียบร้อย"
+
+#: includes/api/class-content-controller.php:303
+msgid "The requested course was not found."
+msgstr "ไม่พบคอร์สที่ระบุ"
+
+#: includes/api/class-rest-controller.php:44
+msgid "Please log in."
+msgstr "กรุณาเข้าสู่ระบบ"
+
+#. translators: 1: installed Tutor LMS version, 2: issue list
+#: includes/api/class-rest-controller.php:73
+msgid "The structure of Tutor LMS %1$s does not match what this plugin supports, so duplication was stopped to protect your data (%2$s)."
+msgstr "โครงสร้างของ Tutor LMS %1$s ไม่ตรงกับที่ปลั๊กอินรองรับ จึงหยุดการทำสำเนาเพื่อความปลอดภัยของข้อมูล (%2$s)"
+
+#: includes/api/class-rest-controller.php:94
+msgid "This item is already being duplicated. Please wait a moment."
+msgstr "กำลังทำสำเนารายการนี้อยู่ กรุณารอสักครู่"
+
+#: includes/api/class-topic-controller.php:97
+msgid "The requested topic was not found."
+msgstr "ไม่พบหัวข้อที่ระบุ"
+
+#: includes/api/class-topic-controller.php:107
+#: includes/services/class-topic-duplicator.php:72
+msgid "This topic does not belong to any course."
+msgstr "หัวข้อนี้ไม่ได้อยู่ในคอร์สใด"
+
+#: includes/api/class-topic-controller.php:117
+msgid "This topic does not belong to the specified course."
+msgstr "หัวข้อนี้ไม่ได้อยู่ในคอร์สที่ระบุ"
+
+#: includes/api/class-topic-controller.php:143
+#: includes/integrations/class-react-builder-adapter.php:120
+msgid "Topic duplicated successfully."
+msgstr "ทำสำเนาหัวข้อเรียบร้อย"
+
+#. translators: %d: number of skipped items
+#: includes/api/class-topic-controller.php:148
+msgid "Topic duplicated successfully (%d unsupported item(s) skipped)."
+msgstr "ทำสำเนาหัวข้อเรียบร้อย (ข้าม %d รายการที่ยังไม่รองรับ)"
+
+#: includes/class-compatibility.php:120
+msgid "Tutor LMS was not found."
+msgstr "ไม่พบ Tutor LMS"
+
+#: includes/class-compatibility.php:128
+msgid "course"
+msgstr "คอร์ส"
+
+#: includes/class-compatibility.php:129
+msgid "topic"
+msgstr "หัวข้อ"
+
+#: includes/class-compatibility.php:130
+msgid "lesson"
+msgstr "บทเรียน"
+
+#. translators: 1: human label, 2: post type name
+#: includes/class-compatibility.php:139
+msgid "The %1$s post type (%2$s) was not found."
+msgstr "ไม่พบ post type ของ%1$s (%2$s)"
+
+#: includes/class-compatibility.php:151
+msgid "tutor_utils()->can_user_manage() was not found — the plugin will fall back to standard WordPress capabilities."
+msgstr "ไม่พบ tutor_utils()->can_user_manage() — ปลั๊กอินจะใช้สิทธิ์มาตรฐานของ WordPress แทน"
+
+#: includes/class-compatibility.php:468
+msgid "Tutor LMS Curriculum Duplicator requires the Tutor LMS plugin to be activated first."
+msgstr "Tutor LMS Curriculum Duplicator ต้องการให้เปิดใช้งานปลั๊กอิน Tutor LMS ก่อน"
+
+#. translators: 1: installed version, 2: minimum version
+#: includes/class-compatibility.php:475
+msgid "Tutor LMS Curriculum Duplicator supports Tutor LMS %2$s and above, but version %1$s was detected — the duplicate buttons will not be shown."
+msgstr "Tutor LMS Curriculum Duplicator รองรับ Tutor LMS ตั้งแต่เวอร์ชัน %2$s ขึ้นไป แต่ตรวจพบเวอร์ชัน %1$s — ปุ่มทำสำเนาจะไม่แสดง"
+
+#. translators: 1: installed version, 2: tested version
+#: includes/class-compatibility.php:485
+msgid "Tutor LMS Curriculum Duplicator has been verified against Tutor LMS %2$s, but version %1$s was detected. The plugin keeps working, but test duplicating lessons and topics on staging first, because a newer version may change the Course Builder structure or meta keys."
+msgstr "Tutor LMS Curriculum Duplicator ตรวจสอบซอร์สโค้ดไว้ถึง Tutor LMS %2$s แต่ตรวจพบเวอร์ชัน %1$s ปลั๊กอินยังทำงานต่อ แต่ควรทดสอบการทำสำเนาบทเรียนและหัวข้อบน Staging ก่อนใช้งานจริง เพราะเวอร์ชันใหม่อาจเปลี่ยนโครงสร้าง Course Builder หรือ meta key"
+
+#. translators: %s: issue detail
+#: includes/class-compatibility.php:501
+msgid "Tutor LMS Curriculum Duplicator: %s"
+msgstr "Tutor LMS Curriculum Duplicator: %s"
+
+#: includes/class-plugin.php:75
+msgid "Tutor LMS Pro detected (its built-in Duplicate feature is already active)"
+msgstr "ตรวจพบ Tutor LMS Pro (ฟีเจอร์ Duplicate ของ Pro ทำงานอยู่แล้ว)"
+
+#. translators: 1: installed version, 2: tested version
+#: includes/class-plugin.php:80
+msgid "Tutor LMS %1$s — untested (verified up to %2$s)"
+msgstr "Tutor LMS %1$s — ยังไม่ได้ทดสอบ (ตรวจสอบไว้ถึง %2$s)"
+
+#. translators: %s: Tutor LMS version
+#: includes/class-plugin.php:88
+msgid "Running with Tutor LMS %s"
+msgstr "ทำงานกับ Tutor LMS %s"
+
+#: includes/integrations/class-react-builder-adapter.php:112
+#: includes/integrations/class-react-builder-adapter.php:127
+msgid "Duplicate lesson"
+msgstr "ทำสำเนาบทเรียน"
+
+#: includes/integrations/class-react-builder-adapter.php:113
+msgid "Duplicate quiz"
+msgstr "ทำสำเนาแบบทดสอบ"
+
+#: includes/integrations/class-react-builder-adapter.php:114
+msgid "Duplicate assignment"
+msgstr "ทำสำเนางานที่มอบหมาย"
+
+#: includes/integrations/class-react-builder-adapter.php:117
+msgid "Duplicate"
+msgstr "ทำสำเนา"
+
+#: includes/integrations/class-react-builder-adapter.php:118
+msgid "Duplicating…"
+msgstr "กำลังคัดลอก..."
+
+#: includes/integrations/class-react-builder-adapter.php:119
+msgid "Duplicated successfully."
+msgstr "ทำสำเนาเรียบร้อย"
+
+#: includes/integrations/class-react-builder-adapter.php:121
+msgid "Duplication failed. Please try again."
+msgstr "ทำสำเนาไม่สำเร็จ กรุณาลองใหม่อีกครั้ง"
+
+#: includes/integrations/class-react-builder-adapter.php:122
+msgid "Could not reach the server."
+msgstr "เชื่อมต่อเซิร์ฟเวอร์ไม่สำเร็จ"
+
+#: includes/integrations/class-react-builder-adapter.php:123
+msgid "Duplicated successfully, but the screen has not updated."
+msgstr "ทำสำเนาเรียบร้อย แต่หน้าจอยังไม่อัปเดต"
+
+#: includes/integrations/class-react-builder-adapter.php:124
+msgid "Reload page"
+msgstr "โหลดหน้าใหม่"
+
+#: includes/integrations/class-react-builder-adapter.php:125
+msgid "The curriculum data is out of sync. Please reload the page."
+msgstr "ข้อมูลหลักสูตรไม่ตรงกัน กรุณาโหลดหน้าใหม่"
+
+#: includes/integrations/class-react-builder-adapter.php:126
+msgid "Duplicate topic with all its content"
+msgstr "ทำสำเนาหัวข้อพร้อมเนื้อหาทั้งหมด"
+
+#: includes/services/class-assignment-duplicator.php:68
+msgid "The source assignment was not found."
+msgstr "ไม่พบงานที่มอบหมายต้นฉบับ"
+
+#: includes/services/class-assignment-duplicator.php:77
+msgid "The selected item is not an assignment."
+msgstr "รายการที่เลือกไม่ใช่งานที่มอบหมาย"
+
+#: includes/services/class-content-duplicator.php:74
+msgid "The source item was not found."
+msgstr "ไม่พบรายการต้นฉบับ"
+
+#: includes/services/class-content-duplicator.php:83
+msgid "The selected item is not a supported content type."
+msgstr "ชนิดของรายการที่เลือกไม่ตรงกับที่รองรับ"
+
+#: includes/services/class-content-duplicator.php:153
+msgid "Items in the trash cannot be duplicated."
+msgstr "ไม่สามารถทำสำเนารายการที่อยู่ในถังขยะได้"
+
+#: includes/services/class-content-duplicator.php:163
+msgid "The destination topic was not found."
+msgstr "ไม่พบหัวข้อปลายทาง"
+
+#: includes/services/class-content-duplicator.php:173
+msgid "The destination topic does not belong to any course."
+msgstr "หัวข้อปลายทางไม่ได้อยู่ในคอร์สใด"
+
+#: includes/services/class-content-duplicator.php:301
+msgid "Could not create the duplicate."
+msgstr "สร้างสำเนาไม่สำเร็จ"
+
+#: includes/services/class-lesson-duplicator.php:66
+msgid "The source lesson was not found."
+msgstr "ไม่พบบทเรียนต้นฉบับ"
+
+#: includes/services/class-lesson-duplicator.php:75
+msgid "The selected item is not a lesson."
+msgstr "รายการที่เลือกไม่ใช่บทเรียน"
+
+#: includes/services/class-quiz-duplicator.php:103
+msgid "The source quiz was not found."
+msgstr "ไม่พบแบบทดสอบต้นฉบับ"
+
+#: includes/services/class-quiz-duplicator.php:112
+msgid "The selected item is not a quiz."
+msgstr "รายการที่เลือกไม่ใช่แบบทดสอบ"
+
+#: includes/services/class-quiz-duplicator.php:178
+msgid "The Tutor LMS quiz question tables were not found, so the quiz cannot be duplicated."
+msgstr "ไม่พบตารางคำถามของ Tutor LMS จึงทำสำเนาแบบทดสอบไม่ได้"
+
+#: includes/services/class-quiz-duplicator.php:248
+msgid "Could not copy the quiz questions."
+msgstr "คัดลอกคำถามของแบบทดสอบไม่สำเร็จ"
+
+#: includes/services/class-quiz-duplicator.php:295
+msgid "Could not copy the quiz answer options."
+msgstr "คัดลอกตัวเลือกคำตอบของแบบทดสอบไม่สำเร็จ"
+
+#: includes/services/class-title-generator.php:40
+msgid "– Copy"
+msgstr "– สำเนา"
+
+#: includes/services/class-topic-duplicator.php:62
+msgid "The source topic was not found."
+msgstr "ไม่พบหัวข้อต้นฉบับ"
+
+#: includes/services/class-topic-duplicator.php:66
+msgid "Topics in the trash cannot be duplicated."
+msgstr "ไม่สามารถทำสำเนาหัวข้อที่อยู่ในถังขยะได้"
+
+#. translators: 1: number of items in topic, 2: maximum supported
+#: includes/services/class-topic-duplicator.php:93
+msgid "This topic has %1$d items, which exceeds the limit of %2$d per duplication. Please split the topic first."
+msgstr "หัวข้อนี้มีเนื้อหา %1$d รายการ เกินขีดจำกัด %2$d รายการต่อการทำสำเนาหนึ่งครั้ง กรุณาแบ่งหัวข้อก่อน"
+
+#: includes/services/class-topic-duplicator.php:136
+msgid "Could not create the topic duplicate."
+msgstr "สร้างสำเนาหัวข้อไม่สำเร็จ"
+
+#: tutor-lms-curriculum-duplicator.php:118
+msgid "Tutor LMS Curriculum Duplicator requires PHP 7.4 or higher."
+msgstr "Tutor LMS Curriculum Duplicator ต้องการ PHP 7.4 ขึ้นไป"
+
+#: tutor-lms-curriculum-duplicator.php:119
+msgid "Could not activate the plugin"
+msgstr "ไม่สามารถเปิดใช้งานปลั๊กอินได้"
+
+#: includes/api/class-rest-controller.php
+msgid "Could not start duplication safely. Please try again."
+msgstr "ไม่สามารถเริ่มการทำสำเนาอย่างปลอดภัยได้ กรุณาลองอีกครั้ง"
+
+#: includes/class-curriculum-order.php
+msgid "Could not update the curriculum order."
+msgstr "ไม่สามารถอัปเดตลำดับหลักสูตรได้"
+
+#: includes/services/class-content-duplicator.php
+msgid "The item could not be duplicated because an unexpected error occurred."
+msgstr "ไม่สามารถทำสำเนารายการได้เนื่องจากเกิดข้อผิดพลาดที่ไม่คาดคิด"
+
+#: includes/services/class-content-duplicator.php
+msgid "Could not update the copied item settings."
+msgstr "ไม่สามารถอัปเดตการตั้งค่าของรายการสำเนาได้"
+
+#: includes/services/class-post-meta-copier.php
+msgid "Could not copy the item settings."
+msgstr "ไม่สามารถคัดลอกการตั้งค่าของรายการได้"
+
+#: includes/services/class-quiz-duplicator.php
+msgid "Could not read the source quiz questions."
+msgstr "ไม่สามารถอ่านคำถามของแบบทดสอบต้นฉบับได้"
+
+#: includes/services/class-quiz-duplicator.php
+msgid "Could not read the source quiz answer options."
+msgstr "ไม่สามารถอ่านตัวเลือกคำตอบของแบบทดสอบต้นฉบับได้"
+
+#: includes/services/class-topic-duplicator.php
+msgid "The topic could not be duplicated because an unexpected error occurred."
+msgstr "ไม่สามารถทำสำเนาหัวข้อได้เนื่องจากเกิดข้อผิดพลาดที่ไม่คาดคิด"

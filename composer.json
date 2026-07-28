@@ -1,0 +1,35 @@
+{
+	"name": "wachiravit/tutor-lms-curriculum-duplicator",
+	"description": "เพิ่มปุ่มทำสำเนา (Duplicate) ให้บทเรียน แบบทดสอบ งานที่มอบหมาย และหัวข้อ ในหน้า Course Builder ของ Tutor LMS รุ่นฟรี",
+	"type": "wordpress-plugin",
+	"license": "GPL-2.0-or-later",
+	"require": {
+		"php": ">=7.4"
+	},
+	"require-dev": {
+		"yoast/phpunit-polyfills": "^2.0",
+		"squizlabs/php_codesniffer": "^3.9",
+		"wp-coding-standards/wpcs": "^3.1",
+		"phpcompatibility/phpcompatibility-wp": "^2.1",
+		"dealerdirect/phpcodesniffer-composer-installer": "^1.0",
+		"phpunit/phpunit": "^9.6"
+	},
+	"config": {
+		"allow-plugins": {
+			"dealerdirect/phpcodesniffer-composer-installer": true
+		}
+	},
+	"scripts": {
+		"lint": "phpcs",
+		"lint:fix": "phpcbf",
+		"test": "phpunit",
+		"test:unit": "phpunit --testsuite unit",
+		"test:integration": "phpunit --testsuite integration",
+		"i18n:pot": "python3 bin/make-pot.py",
+		"i18n:mo": "python3 bin/compile-mo.py languages/tutor-lms-curriculum-duplicator-th.po",
+		"i18n:check": [
+			"python3 bin/make-pot.py --check",
+			"python3 bin/compile-mo.py --check languages/tutor-lms-curriculum-duplicator-th.po"
+		]
+	}
+}

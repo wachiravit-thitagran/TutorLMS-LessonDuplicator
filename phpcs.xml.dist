@@ -1,0 +1,84 @@
+<?xml version="1.0"?>
+<ruleset name="Tutor LMS Curriculum Duplicator">
+	<description>WordPress Coding Standards สำหรับปลั๊กอินนี้</description>
+
+	<file>.</file>
+
+	<exclude-pattern>/vendor/*</exclude-pattern>
+	<exclude-pattern>/node_modules/*</exclude-pattern>
+	<exclude-pattern>/dist/*</exclude-pattern>
+	<exclude-pattern>/bin/*</exclude-pattern>
+
+	<arg name="extensions" value="php"/>
+	<arg name="colors"/>
+	<arg value="sp"/>
+	<arg name="parallel" value="8"/>
+
+	<rule ref="WordPress">
+		<!--
+			โค้ดชุดนี้ใช้ตัวแปรและข้อความภาษาไทยจำนวนมาก การบังคับ Yoda condition
+			และ escaping ทุกจุดใน SQL ที่ prepare แล้วทำให้อ่านยากโดยไม่เพิ่มความปลอดภัย
+		-->
+		<exclude name="Generic.Commenting.DocComment.MissingShort"/>
+		<exclude name="Generic.Commenting.DocComment.ShortNotCapital"/>
+		<exclude name="Generic.Commenting.DocComment.LongNotCapital"/>
+		<exclude name="Squiz.Commenting.FileComment.Missing"/>
+		<exclude name="Universal.NamingConventions.NoReservedKeywordParameterNames"/>
+		<exclude name="WordPress.NamingConventions.ValidHookName"/>
+		<exclude name="WordPress.WP.Capabilities.Unknown"/>
+	</rule>
+
+	<!-- ปลั๊กอินใช้ prefix TLCD_ / tlcd_ / TLCD\ -->
+	<rule ref="WordPress.NamingConventions.PrefixAllGlobals">
+		<properties>
+			<property name="prefixes" type="array">
+				<element value="tlcd"/>
+				<element value="TLCD"/>
+			</property>
+		</properties>
+		<exclude-pattern>/tests/*</exclude-pattern>
+	</rule>
+
+	<rule ref="WordPress.WP.I18n">
+		<properties>
+			<property name="text_domain" type="array">
+				<element value="tutor-lms-curriculum-duplicator"/>
+			</property>
+		</properties>
+	</rule>
+
+	<config name="minimum_wp_version" value="6.0"/>
+
+	<!-- ชุดทดสอบมีรูปแบบต่างจากโค้ดปลั๊กอินตามธรรมชาติ -->
+	<rule ref="WordPress.Files.FileName">
+		<exclude-pattern>/tests/*</exclude-pattern>
+	</rule>
+	<rule ref="WordPress.NamingConventions.ValidFunctionName">
+		<exclude-pattern>/tests/*</exclude-pattern>
+	</rule>
+	<rule ref="WordPress.DB.DirectDatabaseQuery">
+		<exclude-pattern>/tests/*</exclude-pattern>
+	</rule>
+	<rule ref="WordPress.DB.PreparedSQL">
+		<exclude-pattern>/tests/*</exclude-pattern>
+	</rule>
+	<rule ref="Squiz.Commenting.FunctionComment.MissingParamTag">
+		<exclude-pattern>/tests/*</exclude-pattern>
+	</rule>
+	<rule ref="Squiz.Commenting.FunctionComment.Missing">
+		<exclude-pattern>/tests/*</exclude-pattern>
+	</rule>
+	<rule ref="Generic.Commenting.DocComment.ShortNotCapital">
+		<exclude-pattern>/tests/*</exclude-pattern>
+	</rule>
+	<rule ref="Generic.Files.OneObjectStructurePerFile">
+		<exclude-pattern>/tests/*</exclude-pattern>
+	</rule>
+	<rule ref="Generic.CodeAnalysis.UnusedFunctionParameter">
+		<exclude-pattern>/tests/*</exclude-pattern>
+	</rule>
+
+	<!-- ตรวจความเข้ากันได้กับ PHP ที่รองรับ -->
+	<rule ref="PHPCompatibilityWP"/>
+	<config name="testVersion" value="7.4-"/>
+</ruleset>

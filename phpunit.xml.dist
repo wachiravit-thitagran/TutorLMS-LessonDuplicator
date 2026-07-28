@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<phpunit
+	bootstrap="tests/bootstrap.php"
+	backupGlobals="false"
+	colors="true"
+	beStrictAboutTestsThatDoNotTestAnything="false"
+	convertDeprecationsToExceptions="false"
+	failOnWarning="true"
+	>
+	<testsuites>
+		<!--
+			unit        = ทำงานได้โดยไม่ต้องมี Tutor LMS (ใช้ post type จำลองจาก TLCD_Seeder)
+			integration = ต้องมี Tutor LMS ติดตั้งจริง จึงจะทดสอบสิทธิ์ผู้สอนได้ครบ
+		-->
+		<testsuite name="unit">
+			<file>tests/test-curriculum-order.php</file>
+			<file>tests/test-lesson-duplicator.php</file>
+			<file>tests/test-quiz-duplicator.php</file>
+			<file>tests/test-meta-copier.php</file>
+			<file>tests/test-rest-lock.php</file>
+			<file>tests/test-i18n.php</file>
+			<file>tests/test-compatibility.php</file>
+		</testsuite>
+		<testsuite name="integration">
+			<file>tests/test-topic-duplicator.php</file>
+			<file>tests/test-permissions.php</file>
+			<file>tests/test-compatibility.php</file>
+		</testsuite>
+	</testsuites>
+</phpunit>
