@@ -7,7 +7,7 @@
 	"type": "module",
 	"scripts": {
 		"lint": "eslint assets/js tests/js tests/e2e playwright.config.mjs --max-warnings=0",
-		"test": "node --test \"tests/js/**/*.test.mjs\"",
+		"test": "node --test tests/js/*.test.mjs",
 		"test:e2e": "playwright test",
 		"test:e2e:list": "playwright test --list",
 		"check": "node --check assets/js/curriculum-duplicator.js && npm run lint && npm test"
