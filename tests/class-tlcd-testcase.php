@@ -16,6 +16,34 @@ defined( 'ABSPATH' ) || exit;
 abstract class TLCD_TestCase extends WP_UnitTestCase {
 
 	/**
+	 * สร้างตารางของ Tutor LMS ครั้งเดียวต่อคลาส ก่อน transaction ของเทสต์เริ่ม
+	 *
+	 * ต้องสร้างที่นี่ ไม่ใช่ใน set_up() เพราะชุดทดสอบของ WordPress จะแทรก filter
+	 * `query` ที่แปลง `CREATE TABLE` เป็น `CREATE TEMPORARY TABLE` ตลอดช่วงที่อยู่ใน
+	 * transaction ของแต่ละเทสต์ และ temporary table จะไม่ปรากฏใน
+	 * `information_schema.tables` ซึ่งเป็นวิธีที่ Quiz_Duplicator::tables_exist()
+	 * ใช้ตรวจว่าตารางของ Tutor LMS มีจริง ทำให้การทำสำเนาแบบทดสอบล้มเหลวทั้งหมด
+	 *
+	 * @param WP_UnitTest_Factory $factory Factory ของชุดทดสอบ (ไม่ได้ใช้).
+	 *
+	 * @return void
+	 */
+	public static function wpSetUpBeforeClass( $factory ) { // phpcs:ignore WordPress.NamingConventions.ValidFunctionName, Generic.CodeAnalysis.UnusedFunctionParameter
+		unset( $factory );
+
+		TLCD_Seeder::ensure_quiz_tables();
+	}
+
+	/**
+	 * เก็บกวาดตารางที่สร้างไว้ เพื่อไม่ให้ค้างอยู่ในฐานข้อมูลของชุดทดสอบ
+	 *
+	 * @return void
+	 */
+	public static function wpTearDownAfterClass() { // phpcs:ignore WordPress.NamingConventions.ValidFunctionName
+		TLCD_Seeder::drop_quiz_tables();
+	}
+
+	/**
 	 * ตั้งค่าเริ่มต้นของแต่ละเทสต์
 	 *
 	 * @return void
@@ -24,7 +52,6 @@ abstract class TLCD_TestCase extends WP_UnitTestCase {
 		parent::set_up();
 
 		TLCD_Seeder::register_post_types();
-		TLCD_Seeder::ensure_quiz_tables();
 
 		// รีเซ็ตผู้ใช้เป็น admin เพื่อให้การตรวจสิทธิ์ไม่รบกวนเทสต์ที่ไม่ได้ทดสอบสิทธิ์.
 		wp_set_current_user( $this->admin_id() );
@@ -38,9 +65,14 @@ abstract class TLCD_TestCase extends WP_UnitTestCase {
 	public function tear_down() {
 		global $wpdb;
 
+		/*
+		 * ใช้ DELETE ไม่ใช่ TRUNCATE เพราะตารางนี้เป็นตารางจริง (ไม่ใช่ temporary)
+		 * และ TRUNCATE เป็น DDL ซึ่งทำให้ MySQL commit transaction ของเทสต์โดยปริยาย
+		 * ข้อมูลที่ seed ไว้จะค้างข้ามเทสต์
+		 */
 		// phpcs:disable WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL.NotPrepared
-		$wpdb->query( "TRUNCATE TABLE {$wpdb->prefix}tutor_quiz_questions" );
-		$wpdb->query( "TRUNCATE TABLE {$wpdb->prefix}tutor_quiz_question_answers" );
+		$wpdb->query( "DELETE FROM {$wpdb->prefix}tutor_quiz_questions" );
+		$wpdb->query( "DELETE FROM {$wpdb->prefix}tutor_quiz_question_answers" );
 		// phpcs:enable
 
 		wp_set_current_user( 0 );

@@ -29,6 +29,13 @@ class TLCD_Seeder {
 	const ASSIGNMENT_POST_TYPE = 'tutor_assignments';
 
 	/**
+	 * ตารางที่ชุดทดสอบสร้างขึ้นเอง (ไม่ใช่ของ Tutor LMS จริง) เพื่อลบคืนตอนจบคลาส
+	 *
+	 * @var string[]
+	 */
+	private static $seeded_tables = array();
+
+	/**
 	 * ลงทะเบียน post type ให้เหมือน Tutor LMS พอสำหรับการทดสอบ
 	 *
 	 * ใช้เมื่อรัน unit test โดยไม่ได้ติดตั้ง Tutor LMS จริง
@@ -64,6 +71,10 @@ class TLCD_Seeder {
 	/**
 	 * สร้างตารางคำถามของ Tutor LMS ถ้ายังไม่มี
 	 *
+	 * ต้องเรียกจาก wpSetUpBeforeClass() เท่านั้น (ดู TLCD_TestCase) เพราะต้องเป็น
+	 * ตารางจริง ไม่ใช่ temporary table — Tutor LMS สร้างตารางจริงตอน activate และ
+	 * ปลั๊กอินตรวจว่ามีตารางผ่าน `information_schema.tables` ซึ่งไม่เห็น temporary table
+	 *
 	 * @throws RuntimeException เมื่อสร้างตารางไม่สำเร็จ.
 	 *
 	 * @return void
@@ -72,6 +83,15 @@ class TLCD_Seeder {
 		global $wpdb;
 
 		$charset_collate = $wpdb->get_charset_collate();
+
+		// จำไว้ว่าตารางไหน "ยังไม่มี" ก่อนเรียก เพื่อลบเฉพาะตารางที่ชุดทดสอบสร้างเอง.
+		foreach ( array( 'tutor_quiz_questions', 'tutor_quiz_question_answers' ) as $suffix ) {
+			$table = $wpdb->prefix . $suffix;
+
+			if ( ! self::table_exists( $table ) && ! in_array( $table, self::$seeded_tables, true ) ) {
+				self::$seeded_tables[] = $table;
+			}
+		}
 
 		// phpcs:disable WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL.NotPrepared
 		$questions_created = $wpdb->query(
@@ -109,6 +129,46 @@ class TLCD_Seeder {
 		if ( false === $questions_created || false === $answers_created ) {
 			throw new RuntimeException( esc_html( 'สร้างตาราง Quiz สำหรับทดสอบไม่สำเร็จ: ' . $wpdb->last_error ) );
 		}
+	}
+
+	/**
+	 * ลบเฉพาะตารางที่ชุดทดสอบสร้างขึ้นเอง
+	 *
+	 * เรียกจาก wpTearDownAfterClass() เพื่อไม่ให้ตารางค้างในฐานข้อมูลของชุดทดสอบ
+	 * ถ้ารันแบบ integration แล้ว Tutor LMS สร้างตารางจริงไว้ก่อนแล้ว จะไม่แตะต้อง
+	 *
+	 * @return void
+	 */
+	public static function drop_quiz_tables() {
+		global $wpdb;
+
+		foreach ( array_reverse( self::$seeded_tables ) as $table ) {
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL.NotPrepared
+			$wpdb->query( "DROP TABLE IF EXISTS {$table}" );
+		}
+
+		self::$seeded_tables = array();
+	}
+
+	/**
+	 * ตารางนี้มีอยู่จริงในฐานข้อมูลหรือไม่ (ไม่นับ temporary table)
+	 *
+	 * @param string $table ชื่อตารางเต็ม.
+	 *
+	 * @return bool
+	 */
+	private static function table_exists( $table ) {
+		global $wpdb;
+
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery
+		$found = $wpdb->get_var(
+			$wpdb->prepare(
+				'SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = DATABASE() AND table_name = %s',
+				$table
+			)
+		);
+
+		return '1' === (string) $found;
 	}
 
 	/**
