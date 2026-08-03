@@ -1,0 +1,274 @@
+name: Build & Release
+
+# Releases are cut from a *tested* commit, not from whatever last landed on
+# main. The CI workflow runs first; only when it reports success for a push to
+# main does this workflow wake up, and it then builds, tags and publishes the
+# exact commit that suite ran against — github.event.workflow_run.head_sha —
+# rather than the current tip of main, which may already have moved on.
+#
+# Skip a release for a particular commit by putting [skip release] in its
+# message. Anything else pushed to main that passes CI gets one.
+on:
+  workflow_run:
+    workflows: ['CI']
+    types: [completed]
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    name: Build & publish
+    # Kept at one indent level so the folded scalar collapses to a single line.
+    #
+    # CI also runs for pull requests and for pushes to develop. On a PR,
+    # head_branch is the source branch and head_sha is an ephemeral merge
+    # commit — never releasable. A PR opened *from* main would otherwise slip
+    # past the branch filter, so exclude it explicitly. Push and a manual CI
+    # dispatch on main both qualify.
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      (github.event.workflow_run.conclusion == 'success' &&
+      github.event.workflow_run.event != 'pull_request' &&
+      github.event.workflow_run.head_branch == 'main' &&
+      !contains(github.event.workflow_run.head_commit.message, '[skip release]'))
+    runs-on: ubuntu-latest
+
+    env:
+      # The single source of truth for this run. Checkout, version computation,
+      # tag and release all use it, so the release can never end up attached to
+      # a different commit than the one whose tests passed.
+      RELEASE_SHA: ${{ github.event.workflow_run.head_sha || github.sha }}
+
+    steps:
+      - name: Checkout the tested commit
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ env.RELEASE_SHA }}
+          fetch-depth: 0
+          fetch-tags: true
+
+      - name: Confirm the checkout
+        run: |
+          set -euo pipefail
+          head=$(git rev-parse HEAD)
+          if [ "$head" != "$RELEASE_SHA" ]; then
+            echo "Checked out ${head} but expected ${RELEASE_SHA}; refusing to release." >&2
+            exit 1
+          fi
+          echo "Releasing ${head}"
+          git log -1 --format='%h %s'
+
+      - name: Compute next version
+        id: ver
+        run: |
+          set -euo pipefail
+          current=$(grep -iE '^\s*\*?\s*Version:' tutor-lms-curriculum-duplicator.php | head -1 | grep -oE '[0-9]+\.[0-9]+\.[0-9]+' | head -1 || true)
+          latest_tag=$(git tag --list 'v*' --sort=-v:refname | grep -oE '^v[0-9]+\.[0-9]+\.[0-9]+$' | head -1 | sed 's/^v//' || true)
+          echo "header=${current:-none}  latest_tag=${latest_tag:-none}"
+
+          # A header nobody can parse means the tree is not in a releasable
+          # state. Falling back to some invented number here would publish a
+          # release the plugin itself does not claim to be.
+          if [ -z "${current}" ]; then
+            echo "No semver Version header in tutor-lms-curriculum-duplicator.php; aborting." >&2
+            exit 1
+          fi
+
+          if [ -z "${latest_tag}" ]; then
+            # First release: the header is the version.
+            next="$current"
+          else
+            higher=$(printf '%s\n%s\n' "$current" "$latest_tag" | sort -V | tail -1)
+            if [ -n "$current" ] && [ "$higher" = "$current" ] && [ "$current" != "$latest_tag" ]; then
+              # A human bumped the header past the last tag: honour it, which is
+              # how a MINOR or MAJOR release is requested.
+              next="$current"
+            else
+              # Otherwise auto-bump the PATCH from the newest tag.
+              IFS=. read -r MA MI PA <<< "$latest_tag"
+              next="${MA}.${MI}.$((PA + 1))"
+            fi
+          fi
+
+          if ! printf '%s' "$next" | grep -qE '^[0-9]+\.[0-9]+\.[0-9]+$'; then
+            echo "Computed version '$next' is not valid semver; aborting." >&2
+            exit 1
+          fi
+
+          if git rev-parse -q --verify "refs/tags/v$next" >/dev/null; then
+            existing=$(git rev-list -n 1 "v$next")
+            if [ "$existing" != "$RELEASE_SHA" ]; then
+              echo "Tag v$next already exists at ${existing}, which is not ${RELEASE_SHA}; aborting." >&2
+              exit 1
+            fi
+          fi
+
+          echo "next=$next" >> "$GITHUB_OUTPUT"
+          echo "tag=v$next" >> "$GITHUB_OUTPUT"
+          echo "Next version: $next (tag v$next)"
+
+      - name: Stamp version into the plugin
+        env:
+          NEXT: ${{ steps.ver.outputs.next }}
+        run: |
+          set -euo pipefail
+
+          # Plugin header and the runtime constant. The constant sed is anchored
+          # on the quoted name, so TLCD_MIN_TUTOR_VERSION,
+          # TLCD_TESTED_TUTOR_VERSION and TLCD_TESTED_TUTOR_BRANCH — which
+          # describe Tutor LMS, not this plugin — cannot match it.
+          sed -i -E "s/^([[:space:]]*\*[[:space:]]*Version:[[:space:]]*).*/\1${NEXT}/" tutor-lms-curriculum-duplicator.php
+          sed -i -E "s/(define\([[:space:]]*'TLCD_VERSION',[[:space:]]*')[^']*(')/\1${NEXT}\2/" tutor-lms-curriculum-duplicator.php
+
+          # readme.txt is what WordPress shows as the installed version.
+          # Anchored at column 0 so the "= 1.1.2 =" changelog headings survive.
+          sed -i -E "s/^(Stable tag:[[:space:]]*).*/\1${NEXT}/" readme.txt
+
+          # The translation template and the Thai catalogue carry the version in
+          # their Project-Id-Version header, and bin/make-pot.py is what renders
+          # that header — stamping the .pot without it would make the CI check
+          # "the .pot must match the source" disagree with itself.
+          sed -i -E "s/(Project-Id-Version: Tutor LMS Curriculum Duplicator )[0-9][0-9.]*/\1${NEXT}/" languages/tutor-lms-curriculum-duplicator.pot
+          sed -i -E "s/(Project-Id-Version: Tutor LMS Curriculum Duplicator )[0-9][0-9.]*/\1${NEXT}/" languages/tutor-lms-curriculum-duplicator-th.po
+          sed -i -E "s/(def render\(entries, version=')[0-9][0-9.]*(')/\1${NEXT}\2/" bin/make-pot.py
+
+          # package.json / package-lock.json hold the dev tooling's copy of the
+          # same number. Rewritten in place with count-limited substitutions:
+          # the first "version" in package.json is the top level one, and the
+          # first two in the lock file are the root and packages[""] entries.
+          # Every dependency uses its own key name, so none can be hit. Loading
+          # and re-dumping the JSON would reformat files npm wrote with tabs.
+          python3 - "$NEXT" <<'PY'
+          import json
+          import re
+          import sys
+
+          next_version = sys.argv[1]
+          pattern = re.compile(r'("version":\s*")[^"]*(")')
+
+          for path, count in (('package.json', 1), ('package-lock.json', 2)):
+              with open(path, encoding='utf-8') as handle:
+                  text = handle.read()
+
+              stamped, made = pattern.subn(r'\g<1>%s\g<2>' % next_version, text, count=count)
+
+              if made != count:
+                  sys.exit('%s: replaced %d "version" keys, expected %d' % (path, made, count))
+
+              with open(path, 'w', encoding='utf-8') as handle:
+                  handle.write(stamped)
+
+              # A broken JSON file would only surface much later, on npm ci.
+              json.loads(stamped)
+          PY
+
+          # languages/*.mo is committed and CI proves it matches the .po, so the
+          # release does not need to generate translations from scratch — but the
+          # .po header was just rewritten, and the .mo embeds that header, so the
+          # catalogue is recompiled exactly the way `composer i18n:mo` does it.
+          # Skipping this would ship a .mo announcing the previous version.
+          python3 bin/compile-mo.py languages/tutor-lms-curriculum-duplicator-th.po
+
+          # Every location must now agree, or the build is not what it claims.
+          check() {
+            local label="$1" found="$2"
+            if [ "$found" != "$NEXT" ]; then
+              echo "${label} is '${found}', expected '${NEXT}'." >&2
+              exit 1
+            fi
+            echo "  ${label}: ${found}"
+          }
+
+          echo "Stamped ${NEXT}:"
+          check 'plugin header' "$(grep -E '^[[:space:]]*\*[[:space:]]*Version:' tutor-lms-curriculum-duplicator.php | head -1 | grep -oE '[0-9]+\.[0-9]+\.[0-9]+' | head -1)"
+          check 'TLCD_VERSION' "$(grep -E "'TLCD_VERSION'" tutor-lms-curriculum-duplicator.php | head -1 | grep -oE '[0-9]+\.[0-9]+\.[0-9]+' | head -1)"
+          check 'readme.txt Stable tag' "$(grep -E '^Stable tag:' readme.txt | grep -oE '[0-9]+\.[0-9]+\.[0-9]+' | head -1)"
+          check 'languages POT header' "$(grep -E 'Project-Id-Version:' languages/tutor-lms-curriculum-duplicator.pot | grep -oE '[0-9]+\.[0-9]+\.[0-9]+' | head -1)"
+          check 'languages th.po header' "$(grep -E 'Project-Id-Version:' languages/tutor-lms-curriculum-duplicator-th.po | grep -oE '[0-9]+\.[0-9]+\.[0-9]+' | head -1)"
+          check 'bin/make-pot.py default' "$(grep -E "def render\(entries, version=" bin/make-pot.py | grep -oE '[0-9]+\.[0-9]+\.[0-9]+' | head -1)"
+          check 'package.json' "$(python3 -c "import json;print(json.load(open('package.json'))['version'])")"
+          check 'package-lock.json root' "$(python3 -c "import json;print(json.load(open('package-lock.json'))['version'])")"
+          check 'package-lock.json own package entry' "$(python3 -c "import json;print(json.load(open('package-lock.json'))['packages']['']['version'])")"
+
+          # The .mo the zip will carry must be the .po's compiled form, and the
+          # .pot must still be what bin/make-pot.py renders from the source.
+          python3 bin/compile-mo.py --check languages/*.po
+          python3 bin/make-pot.py --check
+
+          # A stray sed must not be allowed to ship broken PHP.
+          if command -v php >/dev/null 2>&1; then
+            php -l tutor-lms-curriculum-duplicator.php
+          fi
+
+      - name: Show exactly what the stamp changed
+        run: |
+          set -euo pipefail
+          git --no-pager diff --stat
+          git --no-pager diff -- tutor-lms-curriculum-duplicator.php readme.txt
+
+          # TLCD_MIN_TUTOR_VERSION / TLCD_TESTED_TUTOR_VERSION /
+          # TLCD_TESTED_TUTOR_BRANCH describe which Tutor LMS releases this
+          # plugin works with. A sed that swept them up would silently claim
+          # support for a Tutor LMS version nobody tested, so they must not
+          # appear on either side of the diff. Scoped to the one file that
+          # defines them, so an unrelated change elsewhere that merely mentions
+          # the names cannot trip this.
+          if git --no-pager diff -U0 -- tutor-lms-curriculum-duplicator.php | grep -E '^[+-][^+-].*TLCD_(MIN_TUTOR_VERSION|TESTED_TUTOR_VERSION|TESTED_TUTOR_BRANCH)'; then
+            echo "The stamp touched a Tutor LMS compatibility constant; refusing to release." >&2
+            exit 1
+          fi
+          echo "Tutor LMS compatibility constants untouched:"
+          grep -E "'TLCD_(MIN_TUTOR_VERSION|TESTED_TUTOR_VERSION|TESTED_TUTOR_BRANCH)'" tutor-lms-curriculum-duplicator.php
+
+      - name: Make build script executable
+        run: chmod +x bin/build-zip.sh
+
+      - name: Build plugin zip
+        run: bash bin/build-zip.sh
+
+      - name: List artifacts
+        run: ls -lh dist/
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: plugin-zip
+          path: dist/*.zip
+          if-no-files-found: error
+
+      - name: Publish to GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ steps.ver.outputs.tag }}
+        run: |
+          set -euo pipefail
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            echo "Release $TAG exists — refreshing assets."
+            gh release upload "$TAG" dist/*.zip --clobber
+          else
+            echo "Creating release $TAG at ${RELEASE_SHA}."
+            gh release create "$TAG" dist/*.zip \
+              --target "$RELEASE_SHA" \
+              --title "$TAG" \
+              --generate-notes
+          fi
+
+      - name: Confirm the tag points at the tested commit
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ steps.ver.outputs.tag }}
+        run: |
+          set -euo pipefail
+          tagged=$(gh api "repos/${GITHUB_REPOSITORY}/commits/${TAG}" --jq '.sha')
+          if [ "$tagged" != "$RELEASE_SHA" ]; then
+            echo "Tag ${TAG} resolves to ${tagged}, not ${RELEASE_SHA}." >&2
+            exit 1
+          fi
+          echo "${TAG} → ${tagged}"
