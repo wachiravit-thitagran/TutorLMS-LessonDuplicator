@@ -9,7 +9,16 @@ namespace TLCD;
 
 defined( 'ABSPATH' ) || exit;
 
+/**
+ * Registers curriculum duplication abilities for MCP Adapter.
+ */
 final class MCP {
+
+	/**
+	 * Register hooks when the WordPress Abilities API is available.
+	 *
+	 * @return void
+	 */
 	public static function register() {
 		if ( ! function_exists( 'wp_register_ability' ) || ! function_exists( 'wp_register_ability_category' ) ) {
 			return;
@@ -19,6 +28,11 @@ final class MCP {
 		add_action( 'wp_abilities_api_init', array( __CLASS__, 'register_abilities' ) );
 	}
 
+	/**
+	 * Register the duplicator ability category.
+	 *
+	 * @return void
+	 */
 	public static function register_category() {
 		wp_register_ability_category(
 			'tutorlms-duplicator',
@@ -29,43 +43,111 @@ final class MCP {
 		);
 	}
 
+	/**
+	 * Register MCP-visible abilities.
+	 *
+	 * @return void
+	 */
 	public static function register_abilities() {
-		self::ability( 'get-curriculum', 'Get Course Curriculum', 'GET', '/tlcd/v1/courses/{course_id}/curriculum', array(
-			'course_id' => array( 'type' => 'integer', 'minimum' => 1 ),
-		), array( 'course_id' ), true );
+		$definitions = array(
+			'get-curriculum'   => array(
+				'label'      => 'Get Course Curriculum',
+				'method'     => 'GET',
+				'route'      => '/tlcd/v1/courses/{course_id}/curriculum',
+				'readonly'   => true,
+				'properties' => array(
+					'course_id' => array(
+						'type'    => 'integer',
+						'minimum' => 1,
+					),
+				),
+				'required'   => array( 'course_id' ),
+			),
+			'duplicate-content' => array(
+				'label'      => 'Duplicate Course Content',
+				'method'     => 'POST',
+				'route'      => '/tlcd/v1/contents/{content_id}/duplicate',
+				'readonly'   => false,
+				'properties' => array(
+					'content_id' => array(
+						'type'    => 'integer',
+						'minimum' => 1,
+					),
+					'topic_id'   => array(
+						'type'    => 'integer',
+						'minimum' => 1,
+					),
+				),
+				'required'   => array( 'content_id' ),
+			),
+			'duplicate-topic'   => array(
+				'label'      => 'Duplicate Course Topic',
+				'method'     => 'POST',
+				'route'      => '/tlcd/v1/topics/{topic_id}/duplicate',
+				'readonly'   => false,
+				'properties' => array(
+					'topic_id'  => array(
+						'type'    => 'integer',
+						'minimum' => 1,
+					),
+					'course_id' => array(
+						'type'    => 'integer',
+						'minimum' => 1,
+					),
+				),
+				'required'   => array( 'topic_id' ),
+			),
+		);
 
-		self::ability( 'duplicate-content', 'Duplicate Course Content', 'POST', '/tlcd/v1/contents/{content_id}/duplicate', array(
-			'content_id' => array( 'type' => 'integer', 'minimum' => 1 ),
-			'topic_id'   => array( 'type' => 'integer', 'minimum' => 1 ),
-		), array( 'content_id' ), false );
-
-		self::ability( 'duplicate-topic', 'Duplicate Course Topic', 'POST', '/tlcd/v1/topics/{topic_id}/duplicate', array(
-			'topic_id'  => array( 'type' => 'integer', 'minimum' => 1 ),
-			'course_id' => array( 'type' => 'integer', 'minimum' => 1 ),
-		), array( 'topic_id' ), false );
+		foreach ( $definitions as $name => $definition ) {
+			self::ability( $name, $definition );
+		}
 	}
 
-	private static function ability( $name, $label, $method, $route, array $properties, array $required, $readonly ) {
+	/**
+	 * Register one REST-backed ability.
+	 *
+	 * @param string              $name       Ability suffix.
+	 * @param array<string,mixed> $definition Ability definition.
+	 * @return void
+	 */
+	private static function ability( $name, array $definition ) {
+		$is_readonly = (bool) $definition['readonly'];
+
 		wp_register_ability(
 			'tutorlms-duplicator/' . $name,
 			array(
-				'label'       => $label,
-				'description' => $label . ' using the duplicator REST contract and permission checks.',
-				'category'    => 'tutorlms-duplicator',
-				'input_schema' => array(
+				'label'               => (string) $definition['label'],
+				'description'         => (string) $definition['label'] . ' using the duplicator REST contract and permission checks.',
+				'category'            => 'tutorlms-duplicator',
+				'input_schema'        => array(
 					'type'       => 'object',
-					'properties' => $properties,
-					'required'   => $required,
+					'properties' => (array) $definition['properties'],
+					'required'   => (array) $definition['required'],
 				),
-				'execute_callback'    => static function ( array $input ) use ( $method, $route ) {
-					return self::dispatch( $method, $route, $input );
+				'execute_callback'    => static function ( array $input ) use ( $definition ) {
+					return self::dispatch(
+						(string) $definition['method'],
+						(string) $definition['route'],
+						$input
+					);
 				},
-				'permission_callback' => static function () { return is_user_logged_in(); },
-				'meta'                => self::meta( $readonly ),
+				'permission_callback' => static function () {
+					return is_user_logged_in();
+				},
+				'meta'                => self::meta( $is_readonly ),
 			)
 		);
 	}
 
+	/**
+	 * Dispatch through the plugin REST API so its permission callbacks remain authoritative.
+	 *
+	 * @param string              $method REST method.
+	 * @param string              $route  REST route.
+	 * @param array<string,mixed> $input  Ability input.
+	 * @return mixed
+	 */
 	private static function dispatch( $method, $route, array $input ) {
 		foreach ( array( 'course_id', 'content_id', 'topic_id' ) as $key ) {
 			if ( isset( $input[ $key ] ) ) {
@@ -74,11 +156,13 @@ final class MCP {
 		}
 
 		$request = new \WP_REST_Request( $method, $route );
+
 		foreach ( $input as $key => $value ) {
 			$request->set_param( $key, $value );
 		}
 
 		$response = rest_do_request( $request );
+
 		if ( is_wp_error( $response ) ) {
 			return $response;
 		}
@@ -86,14 +170,23 @@ final class MCP {
 		return $response instanceof \WP_REST_Response ? $response->get_data() : $response;
 	}
 
-	private static function meta( $readonly ) {
+	/**
+	 * Shared MCP metadata.
+	 *
+	 * @param bool $is_readonly Whether the operation is read-only.
+	 * @return array<string,mixed>
+	 */
+	private static function meta( $is_readonly ) {
 		return array(
-			'mcp' => array( 'public' => true, 'type' => 'tool' ),
+			'mcp'         => array(
+				'public' => true,
+				'type'   => 'tool',
+			),
 			'annotations' => array(
-				'readonly' => (bool) $readonly,
-				'destructive' => false,
-				'idempotent' => (bool) $readonly,
-				'openWorldHint' => ! $readonly,
+				'readonly'      => (bool) $is_readonly,
+				'destructive'   => false,
+				'idempotent'    => (bool) $is_readonly,
+				'openWorldHint' => ! $is_readonly,
 			),
 		);
 	}
