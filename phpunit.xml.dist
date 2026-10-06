@@ -20,6 +20,7 @@
 			<file>tests/test-rest-lock.php</file>
 			<file>tests/test-i18n.php</file>
 			<file>tests/test-compatibility.php</file>
+			<file>tests/test-mcp.php</file>
 		</testsuite>
 		<testsuite name="integration">
 			<file>tests/test-topic-duplicator.php</file>
