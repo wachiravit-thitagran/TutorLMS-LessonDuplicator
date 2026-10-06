@@ -106,6 +106,7 @@ function tlcd() {
 }
 
 add_action( 'plugins_loaded', array( tlcd(), 'boot' ), 20 );
+add_action( 'plugins_loaded', array( '\\TLCD\\MCP', 'register' ), 21 );
 
 register_activation_hook(
 	__FILE__,
