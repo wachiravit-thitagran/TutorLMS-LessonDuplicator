@@ -51,7 +51,8 @@ final class MCP {
 	public static function register_abilities() {
 		$definitions = array(
 			'get-curriculum'   => array(
-				'label'      => 'Get Course Curriculum',
+				'label'       => 'Get Course Curriculum',
+				'description' => 'Retrieves the ordered curriculum of a course, including topics and supported child content.',
 				'method'     => 'GET',
 				'route'      => '/tlcd/v1/courses/{course_id}/curriculum',
 				'readonly'   => true,
@@ -64,7 +65,8 @@ final class MCP {
 				'required'   => array( 'course_id' ),
 			),
 			'duplicate-content' => array(
-				'label'      => 'Duplicate Course Content',
+				'label'       => 'Duplicate Course Content',
+				'description' => 'Creates a copy of a supported curriculum item and optionally places the copy in a specified topic.',
 				'method'     => 'POST',
 				'route'      => '/tlcd/v1/contents/{content_id}/duplicate',
 				'readonly'   => false,
@@ -81,7 +83,8 @@ final class MCP {
 				'required'   => array( 'content_id' ),
 			),
 			'duplicate-topic'   => array(
-				'label'      => 'Duplicate Course Topic',
+				'label'       => 'Duplicate Course Topic',
+				'description' => 'Creates a copy of a course topic and its supported curriculum content, optionally within a specified course.',
 				'method'     => 'POST',
 				'route'      => '/tlcd/v1/topics/{topic_id}/duplicate',
 				'readonly'   => false,
@@ -118,7 +121,7 @@ final class MCP {
 			'tutorlms-duplicator/' . $name,
 			array(
 				'label'               => (string) $definition['label'],
-				'description'         => (string) $definition['label'] . ' using the duplicator REST contract and permission checks.',
+				'description'         => (string) $definition['description'],
 				'category'            => 'tutorlms-duplicator',
 				'input_schema'        => array(
 					'type'       => 'object',
