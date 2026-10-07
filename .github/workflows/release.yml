@@ -429,30 +429,58 @@ jobs:
       - name: Build plugin zip
         run: bash bin/build-zip.sh
 
-      - name: List artifacts
-        run: ls -lh dist/
+      - name: Prepare versioned release assets
+        env:
+          VERSION: ${{ steps.ver.outputs.next }}
+        run: |
+          set -euo pipefail
+
+          source_zip="dist/tutor-lms-curriculum-duplicator.zip"
+          release_zip="dist/tutor-lms-curriculum-duplicator-${VERSION}.zip"
+          checksum="${release_zip}.sha256"
+
+          if [ ! -f "$source_zip" ]; then
+            echo "Expected build output not found: $source_zip" >&2
+            exit 1
+          fi
+
+          cp "$source_zip" "$release_zip"
+          sha256sum "$release_zip" > "$checksum"
+
+          echo "Release assets:"
+          ls -lh "$release_zip" "$checksum"
+
+          unzip -Z1 "$release_zip" | grep -qx 'tutor-lms-curriculum-duplicator/tutor-lms-curriculum-duplicator.php'
+          unzip -Z1 "$release_zip" | grep -qx 'tutor-lms-curriculum-duplicator/includes/class-plugin.php'
 
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: plugin-zip
-          path: dist/*.zip
+          name: tutor-lms-curriculum-duplicator-${{ steps.ver.outputs.next }}
+          path: |
+            dist/tutor-lms-curriculum-duplicator-${{ steps.ver.outputs.next }}.zip
+            dist/tutor-lms-curriculum-duplicator-${{ steps.ver.outputs.next }}.zip.sha256
           if-no-files-found: error
 
       - name: Publish to GitHub Release
         env:
           GH_TOKEN: ${{ github.token }}
           TAG: ${{ steps.ver.outputs.tag }}
+          VERSION: ${{ steps.ver.outputs.next }}
         run: |
           set -euo pipefail
+
+          release_zip="dist/tutor-lms-curriculum-duplicator-${VERSION}.zip"
+          checksum="${release_zip}.sha256"
+
           if gh release view "$TAG" >/dev/null 2>&1; then
             echo "Release $TAG exists — refreshing assets."
-            gh release upload "$TAG" dist/*.zip --clobber
+            gh release upload "$TAG" "$release_zip" "$checksum" --clobber
           else
             echo "Creating release $TAG at ${RELEASE_SHA}."
-            gh release create "$TAG" dist/*.zip \
+            gh release create "$TAG" "$release_zip" "$checksum" \
               --target "$RELEASE_SHA" \
-              --title "$TAG" \
+              --title "Tutor LMS Curriculum Duplicator ${VERSION}" \
               --generate-notes
           fi
 
