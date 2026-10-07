@@ -4,7 +4,6 @@
  *
  * @package TLCD\Tests
  */
-
 class TLCD_MCP_Test extends WP_UnitTestCase {
 
 	public function test_registers_mcp_abilities_when_abilities_api_is_available() {
