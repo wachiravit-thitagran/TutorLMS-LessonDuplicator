@@ -50,27 +50,27 @@ final class MCP {
 	 */
 	public static function register_abilities() {
 		$definitions = array(
-			'get-curriculum'   => array(
+			'get-curriculum'    => array(
 				'label'       => 'Get Course Curriculum',
 				'description' => 'Retrieves the ordered curriculum of a course, including topics and supported child content.',
-				'method'     => 'GET',
-				'route'      => '/tlcd/v1/courses/{course_id}/curriculum',
-				'readonly'   => true,
-				'properties' => array(
+				'method'      => 'GET',
+				'route'       => '/tlcd/v1/courses/{course_id}/curriculum',
+				'readonly'    => true,
+				'properties'  => array(
 					'course_id' => array(
 						'type'    => 'integer',
 						'minimum' => 1,
 					),
 				),
-				'required'   => array( 'course_id' ),
+				'required'    => array( 'course_id' ),
 			),
-			'duplicate-content' => array(
+			'duplicate-content'  => array(
 				'label'       => 'Duplicate Course Content',
 				'description' => 'Creates a copy of a supported curriculum item and optionally places the copy in a specified topic.',
-				'method'     => 'POST',
-				'route'      => '/tlcd/v1/contents/{content_id}/duplicate',
-				'readonly'   => false,
-				'properties' => array(
+				'method'      => 'POST',
+				'route'       => '/tlcd/v1/contents/{content_id}/duplicate',
+				'readonly'    => false,
+				'properties'  => array(
 					'content_id' => array(
 						'type'    => 'integer',
 						'minimum' => 1,
@@ -80,15 +80,15 @@ final class MCP {
 						'minimum' => 1,
 					),
 				),
-				'required'   => array( 'content_id' ),
+				'required'    => array( 'content_id' ),
 			),
-			'duplicate-topic'   => array(
+			'duplicate-topic'    => array(
 				'label'       => 'Duplicate Course Topic',
 				'description' => 'Creates a copy of a course topic and its supported curriculum content, optionally within a specified course.',
-				'method'     => 'POST',
-				'route'      => '/tlcd/v1/topics/{topic_id}/duplicate',
-				'readonly'   => false,
-				'properties' => array(
+				'method'      => 'POST',
+				'route'       => '/tlcd/v1/topics/{topic_id}/duplicate',
+				'readonly'    => false,
+				'properties'  => array(
 					'topic_id'  => array(
 						'type'    => 'integer',
 						'minimum' => 1,
@@ -98,7 +98,7 @@ final class MCP {
 						'minimum' => 1,
 					),
 				),
-				'required'   => array( 'topic_id' ),
+				'required'    => array( 'topic_id' ),
 			),
 		);
 
