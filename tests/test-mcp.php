@@ -11,9 +11,6 @@ class TLCD_MCP_Test extends WP_UnitTestCase {
 			$this->markTestSkipped( 'WordPress Abilities API requires WordPress 6.9+.' );
 		}
 
-		do_action( 'wp_abilities_api_categories_init' );
-		do_action( 'wp_abilities_api_init' );
-
 		$this->assertNotNull( wp_get_ability( 'tutorlms-duplicator/get-curriculum' ) );
 		$this->assertNotNull( wp_get_ability( 'tutorlms-duplicator/duplicate-content' ) );
 		$this->assertNotNull( wp_get_ability( 'tutorlms-duplicator/duplicate-topic' ) );
