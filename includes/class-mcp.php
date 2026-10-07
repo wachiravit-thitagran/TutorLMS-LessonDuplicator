@@ -64,7 +64,7 @@ final class MCP {
 				),
 				'required'    => array( 'course_id' ),
 			),
-			'duplicate-content'  => array(
+			'duplicate-content' => array(
 				'label'       => 'Duplicate Course Content',
 				'description' => 'Creates a copy of a supported curriculum item and optionally places the copy in a specified topic.',
 				'method'      => 'POST',
@@ -82,7 +82,7 @@ final class MCP {
 				),
 				'required'    => array( 'content_id' ),
 			),
-			'duplicate-topic'    => array(
+			'duplicate-topic'   => array(
 				'label'       => 'Duplicate Course Topic',
 				'description' => 'Creates a copy of a course topic and its supported curriculum content, optionally within a specified course.',
 				'method'      => 'POST',
