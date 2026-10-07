@@ -445,6 +445,22 @@ GitHub Actions (`.github/workflows/ci.yml`) รัน 6 งาน
 
 ---
 
+
+## GitHub Release package
+
+เมื่อ CI บน `main` ผ่าน ระบบ Release จะสร้างไฟล์พร้อมติดตั้งใน WordPress โดยอัตโนมัติ:
+
+- `tutor-lms-curriculum-duplicator-<version>.zip`
+- `tutor-lms-curriculum-duplicator-<version>.zip.sha256`
+
+ไฟล์ ZIP มีโฟลเดอร์ระดับบนสุดชื่อ `tutor-lms-curriculum-duplicator/` และรวมเฉพาะไฟล์ที่จำเป็นตอนใช้งานจริง เช่น PHP, assets, languages และ readme โดยไม่รวม tests, CI, vendor, node_modules หรือเครื่องมือพัฒนา
+
+สามารถนำ ZIP ไปติดตั้งได้โดยตรงที่:
+
+`Plugins → Add Plugin → Upload Plugin`
+
+ค่า SHA256 ใช้ตรวจสอบความถูกต้องของไฟล์ที่ดาวน์โหลดจาก GitHub Release ได้
+
 ## License
 
 GPL-2.0-or-later
