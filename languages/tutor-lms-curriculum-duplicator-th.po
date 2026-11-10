@@ -330,3 +330,7 @@ msgstr "ไม่สามารถอ่านตัวเลือกคำต
 #: includes/services/class-topic-duplicator.php
 msgid "The topic could not be duplicated because an unexpected error occurred."
 msgstr "ไม่สามารถทำสำเนาหัวข้อได้เนื่องจากเกิดข้อผิดพลาดที่ไม่คาดคิด"
+
+#: includes/api/class-rest-controller.php
+msgid "Curriculum ordering is busy. Please try again."
+msgstr "กำลังจัดลำดับเนื้อหาคอร์ส กรุณาลองอีกครั้ง"

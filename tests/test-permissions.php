@@ -14,6 +14,29 @@ use TLCD\Permission;
  */
 class Test_Permissions extends TLCD_TestCase {
 
+	public function test_shared_topic_order_lock_blocks_different_source_duplicate() {
+		wp_set_current_user( $this->owner_id );
+		$method     = new ReflectionMethod( TLCD\Api\Rest_Controller::class, 'acquire_lock' );
+		$release    = new ReflectionMethod( TLCD\Api\Rest_Controller::class, 'release_lock' );
+		$controller = new TLCD\Api\Content_Controller();
+		$key        = 'topic-order:' . $this->data['topic_one'];
+		$token      = $method->invoke( $controller, $key );
+		try {
+			$request  = new WP_REST_Request( 'POST', '/tlcd/v1/contents/' . $this->data['lesson_a'] . '/duplicate' );
+			$response = $this->server->dispatch( $request );
+			$this->assertSame( 409, $response->get_status() );
+		} finally {
+			$release->invoke( $controller, $key, $token ); }
+	}
+
+	public function test_ability_dispatch_preserves_rest_failure() {
+		wp_set_current_user( $this->student_id );
+		$method = new ReflectionMethod( TLCD\MCP::class, 'dispatch' );
+		$result = $method->invoke( null, 'POST', '/tlcd/v1/contents/{content_id}/duplicate', array( 'content_id' => $this->data['lesson_a'] ) );
+		$this->assertWPError( $result );
+		$this->assertSame( 403, $result->get_error_data()['status'] );
+	}
+
 	/**
 	 * โครงสร้างข้อมูลที่ seed ไว้
 	 *

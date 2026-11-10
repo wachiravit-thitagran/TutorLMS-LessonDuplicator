@@ -52,36 +52,40 @@ msgstr ""
 msgid "You do not have permission to edit this course."
 msgstr ""
 
-#: includes/api/class-content-controller.php:276
+#: includes/api/class-content-controller.php:281
 msgid "Quiz duplicated successfully."
 msgstr ""
 
-#: includes/api/class-content-controller.php:280
+#: includes/api/class-content-controller.php:285
 msgid "Assignment duplicated successfully."
 msgstr ""
 
-#: includes/api/class-content-controller.php:283
+#: includes/api/class-content-controller.php:288
 msgid "Lesson duplicated successfully."
 msgstr ""
 
-#: includes/api/class-content-controller.php:303
+#: includes/api/class-content-controller.php:308
 msgid "The requested course was not found."
 msgstr ""
 
-#: includes/api/class-rest-controller.php:45
+#: includes/api/class-rest-controller.php:48
 msgid "Please log in."
 msgstr ""
 
 #. translators: 1: installed Tutor LMS version, 2: issue list
-#: includes/api/class-rest-controller.php:74
+#: includes/api/class-rest-controller.php:77
 msgid "The structure of Tutor LMS %1$s does not match what this plugin supports, so duplication was stopped to protect your data (%2$s)."
 msgstr ""
 
-#: includes/api/class-rest-controller.php:126
+#: includes/api/class-rest-controller.php:98
+msgid "Curriculum ordering is busy. Please try again."
+msgstr ""
+
+#: includes/api/class-rest-controller.php:139
 msgid "Could not start duplication safely. Please try again."
 msgstr ""
 
-#: includes/api/class-rest-controller.php:135
+#: includes/api/class-rest-controller.php:148
 msgid "This item is already being duplicated. Please wait a moment."
 msgstr ""
 
@@ -98,13 +102,13 @@ msgstr ""
 msgid "This topic does not belong to the specified course."
 msgstr ""
 
-#: includes/api/class-topic-controller.php:143
+#: includes/api/class-topic-controller.php:148
 #: includes/integrations/class-react-builder-adapter.php:122
 msgid "Topic duplicated successfully."
 msgstr ""
 
 #. translators: %d: number of skipped items
-#: includes/api/class-topic-controller.php:148
+#: includes/api/class-topic-controller.php:153
 msgid "Topic duplicated successfully (%d unsupported item(s) skipped)."
 msgstr ""
 
