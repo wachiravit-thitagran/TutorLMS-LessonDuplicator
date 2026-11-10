@@ -170,6 +170,15 @@ final class MCP {
 			return $response;
 		}
 
+		if ( $response instanceof \WP_REST_Response && $response->get_status() >= 400 ) {
+			$data = $response->get_data();
+			return new \WP_Error(
+				$data['code'] ?? 'tlcd_rest_error',
+				$data['message'] ?? 'Curriculum request failed.',
+				array( 'status' => $response->get_status() )
+			);
+		}
+
 		return $response instanceof \WP_REST_Response ? $response->get_data() : $response;
 	}
 

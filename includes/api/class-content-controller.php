@@ -239,9 +239,14 @@ class Content_Controller extends Rest_Controller {
 		}
 
 		$new_id = $this->with_lock(
-			'content:' . $content_id,
-			static function () use ( $duplicator, $content_id, $topic_id ) {
-				return $duplicator->duplicate( $content_id, $topic_id );
+			'topic-order:' . $topic_id,
+			function () use ( $duplicator, $content_id, $topic_id ) {
+				return $this->with_lock(
+					'content:' . $content_id,
+					static function () use ( $duplicator, $content_id, $topic_id ) {
+						return $duplicator->duplicate( $content_id, $topic_id );
+					}
+				);
 			}
 		);
 

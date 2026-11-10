@@ -128,11 +128,16 @@ class Topic_Controller extends Rest_Controller {
 		}
 
 		$result = $this->with_lock(
-			'topic:' . $topic_id,
-			static function () use ( $topic_id ) {
-				$duplicator = new Topic_Duplicator();
+			'course-order:' . $course_id,
+			function () use ( $topic_id ) {
+				return $this->with_lock(
+					'topic:' . $topic_id,
+					static function () use ( $topic_id ) {
+						$duplicator = new Topic_Duplicator();
 
-				return $duplicator->duplicate( $topic_id );
+						return $duplicator->duplicate( $topic_id );
+					}
+				);
 			}
 		);
 

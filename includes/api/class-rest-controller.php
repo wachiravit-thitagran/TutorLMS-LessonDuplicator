@@ -26,6 +26,9 @@ abstract class Rest_Controller {
 	 */
 	const LOCK_TTL = 300;
 
+	/** @var array<string,string> Non-expiring sibling-order claim tokens. */
+	private static $order_claims = array();
+
 	/**
 	 * ลงทะเบียน route
 	 *
@@ -88,6 +91,16 @@ abstract class Rest_Controller {
 	 */
 	protected function acquire_lock( $key ) {
 		global $wpdb;
+
+		if ( preg_match( '/^(topic|course)-order:/', $key ) ) {
+			$name = 'tlcd_order_' . hash( 'sha1', DB_NAME . ':' . $wpdb->prefix . ':' . $key );
+			if ( isset( self::$order_claims[ $name ] ) || '1' !== (string) $wpdb->get_var( $wpdb->prepare( 'SELECT GET_LOCK(%s, 0)', $name ) ) ) {
+				return new WP_Error( 'tlcd_duplicate_in_progress', __( 'Curriculum ordering is busy. Please try again.', 'tutor-lms-curriculum-duplicator' ), array( 'status' => 409 ) );
+			}
+			$token                       = wp_generate_uuid4();
+			self::$order_claims[ $name ] = $token;
+			return $token;
+		}
 
 		$option_name = $this->lock_option_name( $key );
 		$token       = wp_generate_uuid4();
@@ -152,6 +165,15 @@ abstract class Rest_Controller {
 	 */
 	protected function release_lock( $key, $token ) {
 		global $wpdb;
+
+		if ( preg_match( '/^(topic|course)-order:/', $key ) ) {
+			$name = 'tlcd_order_' . hash( 'sha1', DB_NAME . ':' . $wpdb->prefix . ':' . $key );
+			if ( ( self::$order_claims[ $name ] ?? null ) === $token ) {
+				$wpdb->get_var( $wpdb->prepare( 'SELECT RELEASE_LOCK(%s)', $name ) );
+				unset( self::$order_claims[ $name ] );
+			}
+			return;
+		}
 
 		$option_name = $this->lock_option_name( $key );
 		$value_like  = '%|' . $wpdb->esc_like( (string) $token );
