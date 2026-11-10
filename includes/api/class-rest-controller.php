@@ -94,6 +94,8 @@ abstract class Rest_Controller {
 
 		if ( preg_match( '/^(topic|course)-order:/', $key ) ) {
 			$name = 'tlcd_order_' . hash( 'sha1', DB_NAME . ':' . $wpdb->prefix . ':' . $key );
+			// Advisory lock state must be read from the active DB connection, never cached.
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 			if ( isset( self::$order_claims[ $name ] ) || '1' !== (string) $wpdb->get_var( $wpdb->prepare( 'SELECT GET_LOCK(%s, 0)', $name ) ) ) {
 				return new WP_Error( 'tlcd_duplicate_in_progress', __( 'Curriculum ordering is busy. Please try again.', 'tutor-lms-curriculum-duplicator' ), array( 'status' => 409 ) );
 			}
@@ -169,6 +171,8 @@ abstract class Rest_Controller {
 		if ( preg_match( '/^(topic|course)-order:/', $key ) ) {
 			$name = 'tlcd_order_' . hash( 'sha1', DB_NAME . ':' . $wpdb->prefix . ':' . $key );
 			if ( ( self::$order_claims[ $name ] ?? null ) === $token ) {
+				// Release the connection-owned advisory lock immediately; cached queries cannot release it.
+				// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 				$wpdb->get_var( $wpdb->prepare( 'SELECT RELEASE_LOCK(%s)', $name ) );
 				unset( self::$order_claims[ $name ] );
 			}

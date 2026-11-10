@@ -77,15 +77,15 @@ msgstr ""
 msgid "The structure of Tutor LMS %1$s does not match what this plugin supports, so duplication was stopped to protect your data (%2$s)."
 msgstr ""
 
-#: includes/api/class-rest-controller.php:98
+#: includes/api/class-rest-controller.php:100
 msgid "Curriculum ordering is busy. Please try again."
 msgstr ""
 
-#: includes/api/class-rest-controller.php:139
+#: includes/api/class-rest-controller.php:141
 msgid "Could not start duplication safely. Please try again."
 msgstr ""
 
-#: includes/api/class-rest-controller.php:148
+#: includes/api/class-rest-controller.php:150
 msgid "This item is already being duplicated. Please wait a moment."
 msgstr ""
 
